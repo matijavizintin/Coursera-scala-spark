@@ -38,3 +38,6 @@ project/plugins/project/
 .history
 .cache
 .lib/
+
+# files to big
+*.xml.gz
