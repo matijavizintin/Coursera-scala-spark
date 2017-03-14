@@ -1,6 +1,5 @@
 package week1
 
-import org.apache.spark.util.Vector
 import org.apache.spark.{SparkConf, SparkContext}
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
@@ -31,14 +30,13 @@ class RDDSuite extends FunSuite with Serializable {
     test("Test fake logistic regression") {
         val r = new Random()
 
-        val d = 10
         val numIterations = 10
 
-        val alpha = Vector.random(d)
+        val alpha = r.nextDouble()
         val parsePoints: String => Point = _ => Point(r.nextDouble(), r.nextDouble())
 
         val points = sc.textFile(path + "enwiki-latest-abstract.xml.gz").map(parsePoints).persist()
-        var w = Vector.zeros(d)
+        var w = r.nextDouble()
 
         for (_ <- 1 to numIterations) {
             val gradient = points.map {

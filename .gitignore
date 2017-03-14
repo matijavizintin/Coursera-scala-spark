@@ -40,4 +40,4 @@ project/plugins/project/
 .lib/
 
 # files to big
-*.xml.gz
+*.gz
