@@ -58,6 +58,11 @@ class PartitioningSuite extends FunSuite {
         }.reduceByKey {
             case ((cnt1, p1), (cnt2, p2)) => (cnt1 + cnt2, p1 + p2)
         }.collect()
+
+        // better - preserves the partitioner
+        partitioned.mapValues(p => (1, p)).reduceByKey {
+            case ((cnt1, p1), (cnt2, p2)) => (cnt1 + cnt2, p1 + p2)
+        }.collect()
     }
 
     test("Debug") {
@@ -75,6 +80,14 @@ class PartitioningSuite extends FunSuite {
         }.toDebugString
 
         println(debug)
+        println()
+
+        // better
+        val debug2 = partitioned.mapValues(p => (1, p)).reduceByKey {
+            case ((cnt1, p1), (cnt2, p2)) => (cnt1 + cnt2, p1 + p2)
+        }.toDebugString
+
+        println(debug2)
     }
 
     test("Dependencies") {
