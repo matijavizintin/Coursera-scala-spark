@@ -13,12 +13,12 @@ import scala.util.Random
   */
 @RunWith(classOf[JUnitRunner])
 class PartitioningSuite extends FunSuite {
-    val conf: SparkConf = new SparkConf().setAppName("example").setMaster("local[4]")
+    val conf: SparkConf = new SparkConf().setAppName("example").setMaster("local[7]")
     val sc = new SparkContext(conf)
 
     // smart partitioning is even faster than using reduceByKey (9x from orig on cluster)
     test("Partitioning") {
-        val pairs = sc.parallelize(generateCFFPData(100000)).map(p => (p.customerId, p.price))
+        val pairs = sc.parallelize(generateCFFPData(10000000)).map(p => (p.customerId, p.price))
 
         val tunedPartitioner = new RangePartitioner(8, pairs)
         val partitioned = pairs
@@ -29,7 +29,7 @@ class PartitioningSuite extends FunSuite {
     }
 
     test("Partitioning operations") {
-        val pairs = sc.parallelize(generateCFFPData(100000)).map(p => (p.customerId, p.price))
+        val pairs = sc.parallelize(generateCFFPData(10000000)).map(p => (p.customerId, p.price))
 
         val tunedPartitioner = new RangePartitioner(8, pairs)
         val partitioned = pairs
@@ -46,7 +46,7 @@ class PartitioningSuite extends FunSuite {
     }
 
     test("Partitioning operations 2") {
-        val pairs = sc.parallelize(generateCFFPData(100000)).map(p => (p.customerId, p.price))
+        val pairs = sc.parallelize(generateCFFPData(10000000)).map(p => (p.customerId, p.price))
 
         val tunedPartitioner = new RangePartitioner(8, pairs)
         val partitioned = pairs
