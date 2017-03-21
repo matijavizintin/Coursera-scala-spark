@@ -18,9 +18,9 @@ class SqlSuite extends FunSuite {
     val conf: SparkConf = new SparkConf().setAppName("example").setMaster("local[6]").set("spark.driver.memory", "4g")
     val sc = new SparkContext(conf)
 
-    private def generatePeople() = {
+    private def generatePeople(size: Int = 100000) = {
         val rand = Random
-        (0 until 100 * 1000).map(i => Person(i, rand.nextString(6), rand.nextInt(60), rand.nextString(2), rand.nextString(2)))
+        (0 until size).map(i => Person(i, rand.nextString(6), rand.nextInt(60), rand.nextString(2), rand.nextString(2)))
     }
     private val people = generatePeople()
 
@@ -79,5 +79,16 @@ class SqlSuite extends FunSuite {
 
         val adults = spark.sql("SELECT * FROM people WHERE age > 17 ORDER BY id").count()
         println(adults)
+    }
+
+    test("data frame show") {
+        val rdd = sc.parallelize(generatePeople(100)).map(p => (p.id, p.name, p.age, p.city, p.country))
+
+        val spark = SparkSession.builder().appName("example").getOrCreate()
+        import spark.implicits._
+        val df = rdd.toDF("id", "name", "age", "city", "country")
+
+        df.show()
+        df.printSchema()
     }
 }
