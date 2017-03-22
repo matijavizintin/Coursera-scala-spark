@@ -3,39 +3,19 @@ package week4
 import org.apache.spark.sql.{SparkSession, functions}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.junit.runner.RunWith
-import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
-
-import scala.util.Random
+import week4.helpers.Generator._
+import week4.helpers.Sparky
 
 /**
   * Created by matijav on 20/03/2017.
   */
 @RunWith(classOf[JUnitRunner])
-class DataFrameSuite extends FunSuite {
-    // disable spark logs
-    import org.apache.log4j.{Level, Logger}
-    Logger.getLogger("org").setLevel(Level.ERROR)
-    Logger.getLogger("akka").setLevel(Level.ERROR)
+class DataFrameSuite extends Sparky {
+    val conf: SparkConf = new SparkConf().setAppName("example").setMaster("local[4]")
+    var sc: SparkContext = new SparkContext(conf)
 
-    val conf: SparkConf = new SparkConf().setAppName("example").setMaster("local[6]").set("spark.driver.memory", "4g")
-    val sc = new SparkContext(conf)
-
-    private val cities = List("Sydney", "Melbourne", "Perth", "Canberra", "Adelaide", "Darwin")
-    private val states = List("A", "B", "C")
-
-    private def generateEmployees(size: Int = 100) = {
-        val rand = Random
-        (0 until size).map(i => Employee(
-            i,
-            rand.nextString(6),
-            rand.nextString(6),
-            rand.nextInt(10) + 20,
-            cities(rand.nextInt(6)),
-            states(rand.nextInt(3))
-        ))
-    }
-    private val employees = generateEmployees()
+    private val employees = generateEmployees(100)
     private val rdd = sc.parallelize(employees).map(e => (e.id, e.fname, e.lname, e.age, e.city, e.state))
 
     private val spark = SparkSession.builder().appName("example").getOrCreate()
@@ -76,5 +56,8 @@ class DataFrameSuite extends FunSuite {
     test("aggregate2") {
         val ranked = dataFrame.groupBy($"age", $"state").agg(functions.count($"id")).orderBy($"state", $"count(id)".desc)
         ranked.show(100)
+
+        // debug info about result
+        ranked.head.schema.printTreeString()
     }
 }

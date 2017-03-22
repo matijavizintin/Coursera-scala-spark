@@ -4,37 +4,20 @@ import org.apache.spark.sql.types.{DataTypes, StructField, StructType}
 import org.apache.spark.sql.{Row, SparkSession}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.junit.runner.RunWith
-import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
-
-import scala.util.Random
-import scala.util.parsing.json.JSONObject
+import week4.helpers.Generator._
+import week4.helpers.Sparky
 
 /**
   * Created by matijav on 20/03/2017.
   */
 @RunWith(classOf[JUnitRunner])
-class SqlSuite extends FunSuite {
-    val conf: SparkConf = new SparkConf().setAppName("example").setMaster("local[6]").set("spark.driver.memory", "4g")
-    val sc = new SparkContext(conf)
+class SqlSuite extends Sparky {
+    val conf: SparkConf = new SparkConf().setAppName("example").setMaster("local[4]")
+    var sc: SparkContext = new SparkContext(conf)
 
-    private def generatePeople(size: Int = 100000) = {
-        val rand = Random
-        (0 until size).map(i => Person(i, rand.nextString(6), rand.nextInt(60), rand.nextString(2), rand.nextString(2)))
-    }
     private val people = generatePeople()
-
-    private def generatePeopleJson() = {
-        generatePeople().map(p => Map(
-            ("id", p.id),
-            ("name", p.name),
-            ("age", p.age),
-            ("city", p.city),
-            ("country", p.country)
-        )).map(JSONObject).map(_.toString())
-    }
     private val peopleJson = generatePeopleJson()
-
 
     test("create data frame from schema") {
         val schemaColumns = List("id", "name", "age", "city", "country")

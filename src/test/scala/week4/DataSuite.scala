@@ -2,52 +2,22 @@ package week4
 
 import org.apache.spark.{SparkConf, SparkContext}
 import org.junit.runner.RunWith
-import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
-
-import scala.util.Random
+import week4.helpers.Generator._
+import week4.helpers.Sparky
 
 /**
   * Created by matijav on 20/03/2017.
   */
 @RunWith(classOf[JUnitRunner])
-class DataSuite extends FunSuite {
+class DataSuite extends Sparky {
     val conf: SparkConf = new SparkConf().setAppName("example").setMaster("local[4]")
-    val sc = new SparkContext(conf)
+    var sc: SparkContext = new SparkContext(conf)
 
     private val elements = 100 * 1000
 
-    private val countries = List("Switzerland", "Germany", "France", "Italy", "Spain", "Netherlands", "Belgium", "UK", "Portugal")
-    private val genders = List("Male", "Female")
-
-    private val demographicsList = prepareDemographic()
-    private val financesList = prepareFinances()
-
-    private def prepareDemographic() = {
-        val random = Random
-
-        (0 until elements).map(i => Demographic(
-            i,
-            random.nextInt(20) + 20,
-            random.nextBoolean(),
-            countries(random.nextInt(9)),
-            genders(random.nextInt(1)),
-            random.nextBoolean(),
-            random.nextBoolean()
-        ))
-    }
-
-    private def prepareFinances() = {
-        val random = Random
-
-        (0 until elements).map(i => Finances(
-            i,
-            random.nextBoolean(),
-            random.nextBoolean(),
-            random.nextBoolean(),
-            random.nextInt(50000) + 10000
-        ))
-    }
+    private val demographicsList = generateDemographic(elements)
+    private val financesList = generateFinances(elements)
 
     test("test 1") {
         val demographics = sc.parallelize(demographicsList).map(x => (x.id, x))
