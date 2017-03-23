@@ -1,6 +1,6 @@
 package week2
 
-import org.apache.spark.{SparkConf, SparkContext}
+import helpers.Common._
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
@@ -10,13 +10,9 @@ import org.scalatest.junit.JUnitRunner
   */
 @RunWith(classOf[JUnitRunner])
 class PairRDDSuite extends FunSuite {
-    val path = "src/test/resources/"
-
-    val conf: SparkConf = new SparkConf().setAppName("example").setMaster("local[4]")
-    val sc = new SparkContext(conf)
 
     test("Test pair RDD") {
-        val distFile = sc.textFile(path + "wikipedia.dat.gz").map(WikipediaArticle.parse)
+        val distFile = sc.textFile(PATH_TO_RESOURCES + "wikipedia.dat.gz").map(WikipediaArticle.parse)
 
         // create pair RDD
         val pairRdd = distFile.map(article => (article.title, article.text)).cache()

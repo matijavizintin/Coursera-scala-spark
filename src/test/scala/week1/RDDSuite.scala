@@ -1,6 +1,6 @@
 package week1
 
-import org.apache.spark.{SparkConf, SparkContext}
+import helpers.Common._
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
@@ -13,13 +13,9 @@ import scala.util.Random
   */
 @RunWith(classOf[JUnitRunner])
 class RDDSuite extends FunSuite with Serializable {
-    val path = "src/test/resources/"
-
-    val conf: SparkConf = new SparkConf().setAppName("example").setMaster("local")
-    val sc = new SparkContext(conf)
 
     test("Test spark simple") {
-        val distFile = sc.textFile(path + "enwiki-latest-abstract.xml.gz")
+        val distFile = sc.textFile(PATH_TO_RESOURCES + "enwiki-latest-abstract.xml.gz")
         val rowCount = distFile
                 .map(line => 1)
                 .reduce((acc, v) => acc + v)
@@ -30,12 +26,12 @@ class RDDSuite extends FunSuite with Serializable {
     test("Test fake logistic regression") {
         val r = new Random()
 
-        val numIterations = 10
+        val numIterations = 3
 
         val alpha = r.nextDouble()
         val parsePoints: String => Point = _ => Point(r.nextDouble(), r.nextDouble())
 
-        val points = sc.textFile(path + "enwiki-latest-abstract.xml.gz").map(parsePoints).persist()
+        val points = sc.textFile(PATH_TO_RESOURCES + "enwiki-latest-abstract.xml.gz").map(parsePoints).persist()
         var w = r.nextDouble()
 
         for (_ <- 1 to numIterations) {

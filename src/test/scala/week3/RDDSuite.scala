@@ -1,21 +1,17 @@
 package week3
 
+import helpers.Common._
+import helpers.Generator._
 import org.apache.spark.storage.StorageLevel
-import org.apache.spark.{SparkConf, SparkContext}
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
-
-import scala.collection.mutable.ListBuffer
-import scala.util.Random
 
 /**
   * Created by matijav on 14/03/2017.
   */
 @RunWith(classOf[JUnitRunner])
 class RDDSuite extends FunSuite {
-    val conf: SparkConf = new SparkConf().setAppName("example").setMaster("local[4]").set("spark.driver.memory", "8g")
-    val sc = new SparkContext(conf)
 
     test("Shuffle") {
         val pairRdd = sc.parallelize(List((1, "1"), (2, "2")))
@@ -86,7 +82,7 @@ class RDDSuite extends FunSuite {
     }
 
     test("groupBy performance test") {
-        val purchasesRDD = sc.parallelize(generateCFFPData).persist(StorageLevel.MEMORY_AND_DISK_SER)
+        val purchasesRDD = sc.parallelize(generateCFFPData(100000)).persist(StorageLevel.MEMORY_AND_DISK_SER)
 
         val purchasesPerMonth = purchasesRDD
                 .map(p => (p.customerId, p.price))
@@ -97,7 +93,7 @@ class RDDSuite extends FunSuite {
     }
 
     test("reduceByKey performance test") {
-        val purchasesRDD = sc.parallelize(generateCFFPData).persist(StorageLevel.MEMORY_AND_DISK_SER)
+        val purchasesRDD = sc.parallelize(generateCFFPData(100000)).persist(StorageLevel.MEMORY_AND_DISK_SER)
 
         val purchasesPerMonth = purchasesRDD
                 .map(p => (p.customerId, (1, p.price)))
@@ -107,16 +103,5 @@ class RDDSuite extends FunSuite {
         }
                 // shuffling happens now but with much less data
                 .collect()
-    }
-
-    def generateCFFPData: List[CFFPurchase] = {
-        val rand = Random
-
-        val result = ListBuffer[CFFPurchase]()
-        for (_ <- 1 to 5 * 1000 * 1000) {
-            result += CFFPurchase(rand.nextInt(100), rand.nextString(10), rand.nextDouble() * 10)
-        }
-
-        result.toList
     }
 }

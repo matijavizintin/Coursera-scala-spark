@@ -1,7 +1,9 @@
-package week4.helpers
+package helpers
 
+import week3.CFFPurchase
 import week4.{Demographic, Employee, Finances, Person}
 
+import scala.collection.mutable.ListBuffer
 import scala.util.Random
 import scala.util.parsing.json.JSONObject
 
@@ -14,7 +16,7 @@ object Generator {
     private val countries = List("Switzerland", "Germany", "France", "Italy", "Spain", "Netherlands", "Belgium", "UK", "Portugal")
     private val genders = List("Male", "Female")
 
-    def generateEmployees(size: Int = 100) = {
+    def generateEmployees(size: Int = 100): IndexedSeq[Employee] = {
         val rand = Random
         (0 until size).map(i => Employee(
             i,
@@ -26,7 +28,7 @@ object Generator {
         ))
     }
 
-    def generateFinances(size: Int = 50) = {
+    def generateFinances(size: Int = 50): IndexedSeq[Finances] = {
         val random = Random
 
         (0 until size).map(i => Finances(
@@ -38,7 +40,7 @@ object Generator {
         ))
     }
 
-    def generateDemographic(size: Int = 50) = {
+    def generateDemographic(size: Int = 50): IndexedSeq[Demographic] = {
         val random = Random
 
         (0 until size).map(i => Demographic(
@@ -52,12 +54,12 @@ object Generator {
         ))
     }
 
-    def generatePeople(size: Int = 100000) = {
+    def generatePeople(size: Int = 100000): IndexedSeq[Person] = {
         val rand = Random
         (0 until size).map(i => Person(i, rand.nextString(6), rand.nextInt(60), rand.nextString(2), rand.nextString(2)))
     }
 
-    def generatePeopleJson(size: Int = 100) = {
+    def generatePeopleJson(size: Int = 100): IndexedSeq[String] = {
         generatePeople(size).map(p => Map(
             ("id", p.id),
             ("name", p.name),
@@ -65,5 +67,16 @@ object Generator {
             ("city", p.city),
             ("country", p.country)
         )).map(JSONObject).map(_.toString())
+    }
+
+    def generateCFFPData(size: Int = 100): List[CFFPurchase] = {
+        val rand = Random
+
+        val result = ListBuffer[CFFPurchase]()
+        for (_ <- 1 to size) {
+            result += CFFPurchase(rand.nextInt(100), rand.nextString(10), rand.nextDouble() * 10)
+        }
+
+        result.toList
     }
 }

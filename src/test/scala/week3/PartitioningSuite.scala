@@ -1,24 +1,21 @@
 package week3
 
-import org.apache.spark.{RangePartitioner, SparkConf, SparkContext}
+import helpers.Common._
+import helpers.Generator._
+import org.apache.spark.RangePartitioner
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
-
-import scala.collection.mutable.ListBuffer
-import scala.util.Random
 
 /**
   * Created by matijav on 14/03/2017.
   */
 @RunWith(classOf[JUnitRunner])
 class PartitioningSuite extends FunSuite {
-    val conf: SparkConf = new SparkConf().setAppName("example").setMaster("local[7]")
-    val sc = new SparkContext(conf)
 
     // smart partitioning is even faster than using reduceByKey (9x from orig on cluster)
     test("Partitioning") {
-        val pairs = sc.parallelize(generateCFFPData(10000000)).map(p => (p.customerId, p.price))
+        val pairs = sc.parallelize(generateCFFPData(1000000)).map(p => (p.customerId, p.price))
 
         val tunedPartitioner = new RangePartitioner(8, pairs)
         val partitioned = pairs
@@ -29,7 +26,7 @@ class PartitioningSuite extends FunSuite {
     }
 
     test("Partitioning operations") {
-        val pairs = sc.parallelize(generateCFFPData(10000000)).map(p => (p.customerId, p.price))
+        val pairs = sc.parallelize(generateCFFPData(1000000)).map(p => (p.customerId, p.price))
 
         val tunedPartitioner = new RangePartitioner(8, pairs)
         val partitioned = pairs
@@ -46,7 +43,7 @@ class PartitioningSuite extends FunSuite {
     }
 
     test("Partitioning operations 2") {
-        val pairs = sc.parallelize(generateCFFPData(10000000)).map(p => (p.customerId, p.price))
+        val pairs = sc.parallelize(generateCFFPData(1000000)).map(p => (p.customerId, p.price))
 
         val tunedPartitioner = new RangePartitioner(8, pairs)
         val partitioned = pairs
@@ -116,16 +113,5 @@ class PartitioningSuite extends FunSuite {
         val grouped = reduced.groupByKey()
         println("After groupByKey")
         grouped.dependencies.foreach(println)
-    }
-
-    def generateCFFPData(size: Int): List[CFFPurchase] = {
-        val rand = Random
-
-        val result = ListBuffer[CFFPurchase]()
-        for (_ <- 1 to size) {
-            result += CFFPurchase(rand.nextInt(100), rand.nextString(10), rand.nextDouble() * 10)
-        }
-
-        result.toList
     }
 }
