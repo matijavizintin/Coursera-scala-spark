@@ -1,23 +1,21 @@
 package week4
 
+import helpers.Common._
+import helpers.Generator._
 import org.apache.spark.sql.types.{DataTypes, StructField, StructType}
 import org.apache.spark.sql.{Row, SparkSession}
-import org.apache.spark.{SparkConf, SparkContext}
 import org.junit.runner.RunWith
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
-import week4.helpers.Generator._
-import week4.helpers.Sparky
 
 /**
   * Created by matijav on 20/03/2017.
   */
 @RunWith(classOf[JUnitRunner])
-class SqlSuite extends Sparky {
-    val conf: SparkConf = new SparkConf().setAppName("example").setMaster("local[4]")
-    var sc: SparkContext = new SparkContext(conf)
+class SqlSuite extends FunSuite {
 
-    private val people = generatePeople()
-    private val peopleJson = generatePeopleJson()
+    private val people = generatePeople(100)
+    private val peopleJson = generatePeopleJson(100)
 
     test("create data frame from schema") {
         val schemaColumns = List("id", "name", "age", "city", "country")
@@ -65,7 +63,7 @@ class SqlSuite extends Sparky {
     }
 
     test("data frame show") {
-        val rdd = sc.parallelize(generatePeople(100)).map(p => (p.id, p.name, p.age, p.city, p.country))
+        val rdd = sc.parallelize(people).map(p => (p.id, p.name, p.age, p.city, p.country))
 
         val spark = SparkSession.builder().appName("example").getOrCreate()
         import spark.implicits._
