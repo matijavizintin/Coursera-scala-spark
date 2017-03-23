@@ -1,5 +1,6 @@
 package helpers
 
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.{SparkConf, SparkContext}
 
 /**
@@ -13,6 +14,7 @@ object Common {
 
     val conf: SparkConf = new SparkConf().setAppName("example").setMaster("local[4]")
     val sc: SparkContext = new SparkContext(conf)
+    val spark = SparkSession.builder().appName("example").getOrCreate()
 
     val PATH_TO_RESOURCES = "../../src/test/resources/"
 }

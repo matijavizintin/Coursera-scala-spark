@@ -1,26 +1,20 @@
 package week4
 
-import org.apache.spark.sql.{SparkSession, functions}
-import org.apache.spark.{SparkConf, SparkContext}
+import helpers.Common._
+import helpers.Generator._
+import org.apache.spark.sql.functions
 import org.junit.runner.RunWith
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
-import week4.helpers.Generator._
-import week4.helpers.Sparky
 
 /**
   * Created by matijav on 20/03/2017.
   */
 @RunWith(classOf[JUnitRunner])
-class DataFrameSuite extends Sparky {
-    val conf: SparkConf = new SparkConf().setAppName("example").setMaster("local[4]")
-    var sc: SparkContext = new SparkContext(conf)
-
-    private val employees = generateEmployees(100)
-    private val rdd = sc.parallelize(employees).map(e => (e.id, e.fname, e.lname, e.age, e.city, e.state))
-
-    private val spark = SparkSession.builder().appName("example").getOrCreate()
+class DataFrameSuite extends FunSuite {
     import spark.implicits._
 
+    private val rdd = sc.parallelize(generateEmployees(100)).map(e => (e.id, e.fname, e.lname, e.age, e.city, e.state))
     private val dataFrame = rdd.toDF("id", "fname", "lname", "age", "city", "state")
 
     test("dataframe sql") {
