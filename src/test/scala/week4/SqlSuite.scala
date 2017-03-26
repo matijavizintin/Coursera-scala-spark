@@ -13,7 +13,6 @@ import org.scalatest.junit.JUnitRunner
   */
 @RunWith(classOf[JUnitRunner])
 class SqlSuite extends FunSuite {
-
     private val people = generatePeople(100)
     private val peopleJson = generatePeopleJson(100)
 
